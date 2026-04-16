@@ -1,16 +1,24 @@
 ---
 name: git-commit-message
-description: 根据代码变更生成符合规范的中文 Git 提交信息 (Commit Message)。当用户要求生成提交信息、询问如何 commit，或者需要总结代码变更时使用。注意：只生成文字，不执行任何 git 命令。
+description: 根据代码变更生成符合规范的中文 Git 提交信息 (Commit Message)。当用户要求生成提交信息、询问如何 commit，或者需要总结代码变更时使用。⚠️严禁执行任何修改代码或提交的 git 命令（如 git add, git commit 等），只能输出纯文本供用户参考。
 ---
 
 # Git Commit Message 生成器
+
+## ⚠️ 严禁执行 Git 命令 (CRITICAL RULES)
+
+**这是最高优先级的安全规则，任何情况下都不得违反：**
+
+1. **绝对禁止修改状态**：你 **绝对不能** 使用 Shell 工具执行 `git add`, `git commit`, `git push`, `git rebase` 等任何会改变代码库状态的命令。
+2. **只读权限**：你只能使用只读命令（如 `git status`, `git diff`, `git diff --staged`, `git log`）来获取上下文信息。
+3. **仅输出文本**：你的最终交付物 **必须且只能是** 一段包含 Commit Message 的纯文本（通常放在 Markdown 代码块中），交由用户自行决定是否复制和执行。
 
 ## 核心指令
 
 当用户要求生成 Git 提交信息时，请遵循以下规则：
 
-1. **仅分析暂存区变更**：**必须且仅能**分析用户已经 `git add` 到暂存区（Staging Area）的代码变更。你可以主动运行 `git diff --staged` 或 `git diff --cached` 来获取变更内容。**绝对不要**包含未暂存（unstaged）的修改，除非用户明确要求。如果暂存区为空，请提示用户先执行 `git add`。
-2. **纯文本输出**：**绝对不要**尝试直接执行 `git commit`、`git add` 或其他任何 Git 修改/提交命令。你只需要生成并输出提交信息的**纯文本**。
+1. **仅分析暂存区或工作区变更**：你可以主动运行 `git status`, `git diff` 或 `git diff --staged` 来获取变更内容。**绝对不要**尝试帮用户执行 `git add`。如果暂存区为空，你可以分析未暂存的修改，或者提示用户先执行 `git add`。
+2. **纯文本输出**：**绝对不要**尝试直接执行 `git commit` 或其他任何 Git 修改/提交命令。你只需要生成并输出提交信息的**纯文本**。
 3. **中文表述**：生成的所有提交信息（包括标题和正文）必须使用**中文**表述。
 4. **遵循规范**：使用 Conventional Commits (约定式提交) 规范。
 
