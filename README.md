@@ -12,6 +12,7 @@
 - **[Code Comments](./code-comments/SKILL.md)**: 生成符合规范的高质量代码注释与文档，并自动清理低质量或冗余的 AI 生成废话注释。
 - **[Git Commit Message](./git-commit-message/SKILL.md)**: 根据代码变更自动生成符合规范的中文 Git 提交信息（Commit Message），准确总结代码变更意图。
 - **[Go Unit Test](./go-unit-test/SKILL.md)**: 为 Golang 代码生成高质量、符合地道规范（如表驱动测试、TDD 原则）的单元测试用例。
+- **[GitHub Repo Recommendation](./github-repo-recommendation/SKILL.md)**: 根据 GitHub 仓库地址轻量浏览目标仓库 README，并生成适合 GitHub star list 收录的中文 Markdown 推荐文档。
 
 ## 如何使用
 
@@ -25,6 +26,7 @@
    - *"为当前项目重新生成 readme"*
    - *"帮我给这段 Go 代码写个单元测试"*
    - *"总结一下目前的更改并生成 commit message"*
+   - *"帮我介绍这个 GitHub 仓库，生成一篇 star list 推荐文档"*
 
 ### 在其他 AI 工具中使用
 
