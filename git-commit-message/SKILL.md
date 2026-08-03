@@ -1,30 +1,31 @@
 ---
 name: git-commit-message
-description: 根据代码变更生成符合规范的中文 Git 提交信息 (Commit Message)。当用户要求生成提交信息、询问如何 commit，或者需要总结代码变更时使用。⚠️严禁执行任何修改代码或提交的 git 命令（如 git add, git commit 等），只能输出纯文本供用户参考。
+description: >-
+  根据 git diff 生成符合 Conventional Commits 的中文提交信息。
+  当用户要求生成 commit message、写提交说明、总结暂存区/工作区变更时使用。
+  本技能只输出文本，不执行 git add/commit/push。
 ---
 
-# Git Commit Message 生成器
+# Git Commit Message
 
-## ⚠️ 严禁执行 Git 命令 (CRITICAL RULES)
+## 适用范围
 
-**这是最高优先级的安全规则，任何情况下都不得违反：**
+仅当用户只要提交信息/文案时启用。若用户明确要求「帮我 commit / 提交」，不要用本技能代行提交。
 
-1. **绝对禁止修改状态**：你 **绝对不能** 使用 Shell 工具执行 `git add`, `git commit`, `git push`, `git rebase` 等任何会改变代码库状态的命令。
-2. **只读权限**：你只能使用只读命令（如 `git status`, `git diff`, `git diff --staged`, `git log`）来获取上下文信息。
-3. **仅输出文本**：你的最终交付物 **必须且只能是** 一段包含 Commit Message 的纯文本（通常放在 Markdown 代码块中），交由用户自行决定是否复制和执行。
+## 硬性约束
 
-## 核心指令
+- **只读**：可运行 `git status`、`git diff`、`git diff --staged`、`git log`
+- **禁止**：`git add`、`git commit`、`git push`、`git rebase` 等任何会改变仓库状态的命令
+- **交付物**：仅一段可复制的 commit message 纯文本（放在 ` ```text ` 代码块中）
 
-当用户要求生成 Git 提交信息时，请遵循以下规则：
+## 流程
 
-1. **仅分析暂存区或工作区变更**：你可以主动运行 `git status`, `git diff` 或 `git diff --staged` 来获取变更内容。**绝对不要**尝试帮用户执行 `git add`。如果暂存区为空，你可以分析未暂存的修改，或者提示用户先执行 `git add`。
-2. **纯文本输出**：**绝对不要**尝试直接执行 `git commit` 或其他任何 Git 修改/提交命令。你只需要生成并输出提交信息的**纯文本**。
-3. **中文表述**：生成的所有提交信息（包括标题和正文）必须使用**中文**表述。
-4. **遵循规范**：使用 Conventional Commits (约定式提交) 规范。
+1. 并行读取：`git status`、`git diff --staged`（若为空则 `git diff`）、`git log -5 --oneline`
+2. 判断 type / scope；用中文写 subject，聚焦动机（why），不要复述 diff 流水账
+3. 变更非一眼能懂时，补简短 body（可用列表）
+4. 用单个代码块输出最终文案，不做额外解释（除非用户追问）
 
-## 提交信息格式规范
-
-请使用以下格式生成提交信息：
+## 格式
 
 ```text
 <type>(<scope>): <subject>
@@ -32,48 +33,28 @@ description: 根据代码变更生成符合规范的中文 Git 提交信息 (Com
 <body>
 ```
 
-### Type (类型) 可选值：
-- `feat`: 新功能 (feature)
-- `fix`: 修复 bug
-- `docs`: 仅包含文档的修改
-- `style`: 格式化变动 (不影响代码运行的变动，如空格、格式化、缺失的分号等)
-- `refactor`: 重构 (既不是新增功能，也不是修改 bug 的代码变动)
-- `perf`: 优化相关，比如提升性能、体验
-- `test`: 增加测试或修改现有测试
-- `chore`: 构建过程或辅助工具的变动
-- `revert`: 回滚到上一个版本
+- `type`：`feat` / `fix` / `docs` / `style` / `refactor` / `perf` / `test` / `chore` / `revert`
+- `scope`：选填，按模块缩写（如 `parser`、`db`）
+- `subject`：必填、中文、简洁；对齐仓库已有 commit 文风
+- `body`：选填，说明原因与关键改动点
 
-### Scope (影响范围)
-选填。用于说明本次 commit 影响的范围，比如数据层、控制层、视图层等等，视项目不同而不同。
+## 边界情况
 
-### Subject (简短描述)
-必填。用一句话简明扼要地描述本次变更的目的。
-
-### Body (详细描述)
-选填。详细描述本次修改的原因、动机以及具体的改动点。可以使用列表形式。
+- 暂存区为空：分析工作区变更，或提示用户先 `git add`
+- 多组无关变更：默认给一条主推荐；可附 2–3 个拆分提交建议
+- 疑似含密钥/凭证的文件：在文案外简短提醒，勿写入 commit message 正文
 
 ## 示例
 
-**示例 1：新增功能**
 ```text
 feat(parser): 添加对 binlog 基础事件的解析支持
 
-- 实现了 FormatDescriptionEvent 的解析逻辑
-- 增加了对应的单元测试用例
-- 优化了底层字节读取的性能
+- 实现 FormatDescriptionEvent 解析
+- 补充对应单元测试
 ```
 
-**示例 2：修复 Bug**
 ```text
-fix(db): 修复数据库连接池在并发下泄露的问题
+fix(db): 修复连接池在并发下泄露的问题
 
-在处理高并发请求时，由于未正确释放连接导致连接池耗尽。
-通过在 defer 块中确保连接归还来修复此问题。
-```
-
-**示例 3：重构**
-```text
-refactor: 提取公共的配置读取逻辑
-
-将散落在各个模块的配置读取代码提取到统一的 config 包中，提高代码的可维护性和复用性。
+高并发时连接未正确归还导致池耗尽；在 defer 中确保归还。
 ```
